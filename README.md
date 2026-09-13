@@ -1,3 +1,5 @@
+[![CI](https://github.com/Zaid-mzk/taskflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Zaid-mzk/taskflow/actions/workflows/ci.yml)
+
 # TaskFlow
 
 A full-stack task and project management application inspired by tools like Trello and Asana. Users can create an account, manage projects, and organize tasks through status-based workflows.
