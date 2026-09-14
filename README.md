@@ -462,107 +462,56 @@ The production build accepts `VITE_API_URL` as a build argument so the frontend 
 taskflow/
 
 ├── .github/
-
 │   └── workflows/
-
 │       └── ci.yml
-
 │
-
 ├── backend/
-
 │   ├── app/
-
 │   │   ├── routes/
-
 │   │   │   ├── auth.py
-
 │   │   │   ├── projects.py
-
 │   │   │   └── tasks.py
-
 │   │   ├── config.py
-
 │   │   ├── extensions.py
-
 │   │   ├── models.py
-
 │   │   └── __init__.py
-
 │   │
-
 │   ├── tests/
-
 │   │   ├── conftest.py
-
 │   │   ├── test_auth.py
-
 │   │   ├── test_projects.py
-
 │   │   └── test_tasks.py
-
 │   │
-
 │   ├── Dockerfile
-
 │   ├── requirements.txt
-
 │   └── run.py
-
 │
-
 ├── frontend/
-
 │   ├── src/
-
 │   │   ├── api/
-
 │   │   ├── components/
-
 │   │   ├── context/
-
 │   │   ├── pages/
-
 │   │   ├── App.jsx
-
 │   │   ├── index.css
-
 │   │   └── main.jsx
-
 │   │
-
 │   ├── Dockerfile
-
 │   ├── nginx.conf
-
 │   ├── package.json
-
 │   ├── postcss.config.js
-
 │   ├── tailwind.config.js
-
 │   └── vite.config.js
-
 │
-
 ├── docs/
-
 │   └── screenshots/
-
 │       ├── dashboard.png
-
 │       ├── project.png
-
 │       └── signup.png
-
 │
-
 ├── docker-compose.yml
-
 ├── .gitignore
-
 └── README.md
-
 ```
 
 ---
