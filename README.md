@@ -295,7 +295,7 @@ This verifies backend tests and frontend production builds before changes are me
 Clone the repository:
 
 ```bash
-git clone [https://github.com/Zaid-mzk/taskflow.git](https://github.com/Zaid-mzk/taskflow.git)
+git clone https://github.com/Zaid-mzk/taskflow.git
 
 cd taskflow
 ```
@@ -534,7 +534,7 @@ Changes pushed to `main` trigger automatic redeployment through Railway's GitHub
 
 **Zaid Khan**
 
-- GitHub: [@Zaid-mzk](https://github.com/Zaid-mzk/taskflow)
+- GitHub: [@Zaid-mzk](https://github.com/Zaid-mzk)
 - LinkedIn: [zaidkhan2703](https://www.linkedin.com/in/zaidkhan2703/)
 - Email: zaid270803@gmail.com
 
