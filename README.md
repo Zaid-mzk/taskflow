@@ -8,9 +8,9 @@ TaskFlow allows users to create projects, organize tasks, track task status, and
 
 [![CI](https://github.com/Zaid-mzk/taskflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Zaid-mzk/taskflow/actions/workflows/ci.yml)
 
-**Live Demo:** https://taskflow-production-bf08.up.railway.app
+**Live Demo:** [https://taskflow-production-bf08.up.railway.app](https://taskflow-production-bf08.up.railway.app)
 
-**API Health:** https://distinguished-eagerness-production-5caa.up.railway.app/api/health
+**API Health:** [https://distinguished-eagerness-production-5caa.up.railway.app/api/health](https://distinguished-eagerness-production-5caa.up.railway.app/api/health)
 
 ---
 
@@ -91,46 +91,80 @@ TaskFlow allows users to create projects, organize tasks, track task status, and
 
 ### Production Architecture
 
-```mermaid
-flowchart TD
-
-    U[User] -->|HTTPS| F[React + Vite Frontend<br/>Docker + Nginx<br/>Railway]
-
-    F -->|REST API + JWT| B[Flask Backend<br/>REST API + JWT Auth<br/>Railway]
-
-    B -->|SQLAlchemy| D[(MySQL<br/>Railway)]
+```text
+                         HTTPS
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │    User     │
+                    └──────┬──────┘
+                           │
+                           ▼
+              ┌────────────────────────┐
+              │ React + Vite Frontend  │
+              │ Docker + Nginx         │
+              │ Railway                │
+              └────────────┬───────────┘
+                           │
+                     REST API + JWT
+                           │
+                           ▼
+              ┌────────────────────────┐
+              │ Flask Backend          │
+              │ REST API + JWT Auth    │
+              │ Railway                │
+              └────────────┬───────────┘
+                           │
+                       SQLAlchemy
+                           │
+                           ▼
+              ┌────────────────────────┐
+              │ MySQL                  │
+              │ Railway                │
+              └────────────────────────┘
 ```
 
 ### Request Flow
 
-```mermaid
-flowchart LR
-
-    U[User] --> F[React Frontend]
-
-    F -->|Axios + JWT| B[Flask REST API]
-
-    B -->|SQLAlchemy| D[(MySQL)]
+```text
+User
+ │
+ ▼
+React Frontend
+ │
+ │ Axios + JWT
+ ▼
+Flask REST API
+ │
+ │ SQLAlchemy
+ ▼
+MySQL
 ```
 
 The frontend reads its backend URL from the `VITE_API_URL` environment variable. Locally it points to the Flask development server; in production it points to the deployed Railway backend.
 
 ### Authentication Flow
 
-```mermaid
-flowchart TD
-
-    A[Signup / Login] --> B[Flask validates credentials]
-
-    B --> C[JWT access token generated]
-
-    C --> D[Frontend stores token]
-
-    D --> E["Axios sends Authorization: Bearer <token>"]
-
-    E --> F[Protected route checks JWT]
-
-    F --> G[User ID extracted and used to scope queries]
+```text
+Signup / Login
+      │
+      ▼
+Flask validates credentials
+      │
+      ▼
+JWT access token generated
+      │
+      ▼
+Frontend stores token
+      │
+      ▼
+Axios sends Authorization: Bearer <token>
+      │
+      ▼
+Protected route checks JWT
+      │
+      ▼
+User ID extracted and used to scope queries
 ```
 
 Protected routes require a valid JWT. The authenticated user's ID is extracted from the token and used to scope project and task queries, preventing unauthorized cross-user access.
@@ -231,7 +265,9 @@ Two jobs run in parallel:
 
 ```text
 Python 3.11
+
 → Install dependencies
+
 → Run Pytest
 ```
 
@@ -239,7 +275,9 @@ Python 3.11
 
 ```text
 Node.js 20
+
 → Install dependencies
+
 → Build with Vite
 ```
 
@@ -257,7 +295,7 @@ This verifies backend tests and frontend production builds before changes are me
 Clone the repository:
 
 ```bash
-git clone https://github.com/Zaid-mzk/taskflow.git
+git clone [https://github.com/Zaid-mzk/taskflow.git](https://github.com/Zaid-mzk/taskflow.git)
 
 cd taskflow
 ```
@@ -272,8 +310,8 @@ Local endpoints:
 
 | Service | URL |
 |---------|-----|
-| Frontend | http://localhost:5173 |
-| Backend | http://localhost:5000/api |
+| Frontend | [http://localhost:5173](http://localhost:5173) |
+| Backend | [http://localhost:5000/api](http://localhost:5000/api) |
 | MySQL | localhost:3306 |
 
 Stop the stack:
@@ -304,9 +342,11 @@ Activate the virtual environment:
 
 ```bash
 # macOS / Linux
+
 source venv/bin/activate
 
 # Windows PowerShell
+
 venv\Scripts\Activate.ps1
 ```
 
@@ -320,9 +360,11 @@ Create the environment file:
 
 ```bash
 # macOS / Linux
+
 cp .env.example .env
 
 # Windows PowerShell
+
 Copy-Item .env.example .env
 ```
 
@@ -344,9 +386,11 @@ Create the environment file:
 
 ```bash
 # macOS / Linux
+
 cp .env.example .env
 
 # Windows PowerShell
+
 Copy-Item .env.example .env
 ```
 
@@ -366,7 +410,9 @@ npm run dev
 
 ```text
 SECRET_KEY
+
 JWT_SECRET_KEY
+
 DATABASE_URL
 ```
 
@@ -401,7 +447,9 @@ Flask Backend
 The production frontend uses a multi-stage Docker build:
 
 1. Node.js installs dependencies.
+
 2. Vite generates the production `dist` output.
+
 3. Nginx Alpine serves the generated frontend.
 
 The production build accepts `VITE_API_URL` as a build argument so the frontend communicates with the deployed backend.
@@ -414,56 +462,107 @@ The production build accepts `VITE_API_URL` as a build argument so the frontend 
 taskflow/
 
 ├── .github/
+
 │   └── workflows/
+
 │       └── ci.yml
+
 │
+
 ├── backend/
+
 │   ├── app/
+
 │   │   ├── routes/
+
 │   │   │   ├── auth.py
+
 │   │   │   ├── projects.py
+
 │   │   │   └── tasks.py
+
 │   │   ├── config.py
+
 │   │   ├── extensions.py
+
 │   │   ├── models.py
+
 │   │   └── __init__.py
+
 │   │
+
 │   ├── tests/
+
 │   │   ├── conftest.py
+
 │   │   ├── test_auth.py
+
 │   │   ├── test_projects.py
+
 │   │   └── test_tasks.py
+
 │   │
+
 │   ├── Dockerfile
+
 │   ├── requirements.txt
+
 │   └── run.py
+
 │
+
 ├── frontend/
+
 │   ├── src/
+
 │   │   ├── api/
+
 │   │   ├── components/
+
 │   │   ├── context/
+
 │   │   ├── pages/
+
 │   │   ├── App.jsx
+
 │   │   ├── index.css
+
 │   │   └── main.jsx
+
 │   │
+
 │   ├── Dockerfile
+
 │   ├── nginx.conf
+
 │   ├── package.json
+
 │   ├── postcss.config.js
+
 │   ├── tailwind.config.js
+
 │   └── vite.config.js
+
 │
+
 ├── docs/
+
 │   └── screenshots/
+
 │       ├── dashboard.png
+
 │       ├── project.png
+
 │       └── signup.png
+
 │
+
 ├── docker-compose.yml
+
 ├── .gitignore
+
 └── README.md
+
 ```
 
 ---
@@ -486,7 +585,7 @@ Changes pushed to `main` trigger automatic redeployment through Railway's GitHub
 
 **Zaid Khan**
 
-- GitHub: [@Zaid-mzk](https://github.com/Zaid-mzk)
+- GitHub: [@Zaid-mzk](https://github.com/Zaid-mzk/taskflow)
 - LinkedIn: [zaidkhan2703](https://www.linkedin.com/in/zaidkhan2703/)
 - Email: zaid270803@gmail.com
 
