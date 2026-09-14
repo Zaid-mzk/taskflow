@@ -2,14 +2,31 @@
 
 A full-stack task and project management application built with React, Flask, MySQL, JWT authentication, Docker, and Railway.
 
-*By [Zaid Khan](https://www.linkedin.com/in/zaidkhan2703/)*
+**By [Zaid Khan](https://www.linkedin.com/in/zaidkhan2703/)**
 
-Users can create projects, organize tasks, manage task status, and securely access their own data through authenticated REST APIs.
+TaskFlow allows users to create projects, organize tasks, track task status, and securely manage their own data through authenticated REST APIs.
 
 [![CI](https://github.com/Zaid-mzk/taskflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Zaid-mzk/taskflow/actions/workflows/ci.yml)
 
 **Live Demo:** https://taskflow-production-bf08.up.railway.app
-**Backend Health:** https://distinguished-eagerness-production-5caa.up.railway.app/api/health
+
+**API Health:** https://distinguished-eagerness-production-5caa.up.railway.app/api/health
+
+---
+
+## Screenshots
+
+### Dashboard
+
+![TaskFlow Dashboard](docs/screenshots/dashboard.png)
+
+### Project & Task Management
+
+![TaskFlow Project](docs/screenshots/project.png)
+
+### Authentication
+
+![TaskFlow Signup](docs/screenshots/signup.png)
 
 ---
 
@@ -18,37 +35,69 @@ Users can create projects, organize tasks, manage task status, and securely acce
 - User signup and login with JWT-based authentication
 - Protected API routes scoped to the authenticated user
 - User-specific project ownership and task access
-- Full project CRUD (create, list, retrieve, delete)
-- Full task CRUD (create, list, update, delete)
+- Full project CRUD
+- Full task CRUD
 - Task status management: To Do, In Progress, Done
 - Task filtering by status
 - Project dashboard with task counts
 - Input validation and cross-user access protection
 - RESTful Flask API
-- Automated backend tests with pytest
-- Dockerized development environment and production frontend image
+- Automated backend tests with Pytest
+- Dockerized development and production environments
 - Nginx-based frontend serving
 - GitHub Actions CI
 - Railway production deployment with managed MySQL
 
+---
+
 ## Tech Stack
 
-**Frontend:** React, Vite, Tailwind CSS, React Router, Axios
-**Backend:** Python, Flask, Flask-SQLAlchemy, SQLAlchemy, Flask-JWT-Extended, PyMySQL
-**Database:** MySQL
-**Testing:** Pytest
-**DevOps:** Docker, Docker Compose, Nginx, GitHub Actions, Railway
+**Frontend**
+
+- React
+- Vite
+- Tailwind CSS
+- React Router
+- Axios
+
+**Backend**
+
+- Python
+- Flask
+- Flask-SQLAlchemy
+- SQLAlchemy
+- Flask-JWT-Extended
+- PyMySQL
+
+**Database**
+
+- MySQL
+
+**Testing**
+
+- Pytest
+
+**DevOps & Deployment**
+
+- Docker
+- Docker Compose
+- Nginx
+- GitHub Actions
+- Railway
 
 ---
 
 ## Architecture
 
-### Production
+### Production Architecture
 
 ```mermaid
 flowchart TD
+
     U[User] -->|HTTPS| F[React + Vite Frontend<br/>Docker + Nginx<br/>Railway]
+
     F -->|REST API + JWT| B[Flask Backend<br/>REST API + JWT Auth<br/>Railway]
+
     B -->|SQLAlchemy| D[(MySQL<br/>Railway)]
 ```
 
@@ -56,38 +105,49 @@ flowchart TD
 
 ```mermaid
 flowchart LR
+
     U[User] --> F[React Frontend]
+
     F -->|Axios + JWT| B[Flask REST API]
+
     B -->|SQLAlchemy| D[(MySQL)]
 ```
 
-The frontend reads its backend URL from the `VITE_API_URL` environment variable. Locally it points to the Flask dev server; in production it points to the deployed Railway backend.
+The frontend reads its backend URL from the `VITE_API_URL` environment variable. Locally it points to the Flask development server; in production it points to the deployed Railway backend.
 
 ### Authentication Flow
 
 ```mermaid
 flowchart TD
+
     A[Signup / Login] --> B[Flask validates credentials]
+
     B --> C[JWT access token generated]
+
     C --> D[Frontend stores token]
+
     D --> E["Axios sends Authorization: Bearer <token>"]
+
     E --> F[Protected route checks JWT]
+
     F --> G[User ID extracted and used to scope queries]
 ```
 
-Protected routes require a valid JWT. The authenticated user's ID is extracted from the token and used to scope every project and task query, preventing cross-user access.
+Protected routes require a valid JWT. The authenticated user's ID is extracted from the token and used to scope project and task queries, preventing unauthorized cross-user access.
 
 ---
 
 ## API Reference
 
-All endpoints are prefixed with `/api`. Protected endpoints require:
+All endpoints are prefixed with `/api`.
+
+Protected endpoints require:
 
 ```http
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-### Auth
+### Authentication
 
 ```http
 POST /api/auth/signup
@@ -122,56 +182,99 @@ GET /api/projects/<project_id>/tasks?status=<todo|in_progress|done>
 
 ## Validation
 
-The API validates user input and returns appropriate HTTP status codes with JSON error responses. Validated cases include:
+The API validates user input and returns appropriate HTTP status codes with JSON error responses.
 
-- Required signup fields, email format, minimum password length
+Validated cases include:
+
+- Required signup fields
+- Email format
+- Minimum password length
 - Duplicate emails and usernames
-- Required project names and task titles
+- Required project names
+- Required task titles
 - Supported task statuses
 - Task due-date format
 - Empty task titles during updates
+- Unauthorized access to other users' resources
 
 ---
 
 ## Testing
 
-The backend test suite covers authentication, protected routes, project and task CRUD, task status updates, task filtering, validation, and cross-user access protection.
+The backend test suite covers:
 
-Run locally:
+- User authentication
+- Protected routes
+- Project CRUD
+- Task CRUD
+- Task status updates
+- Task filtering
+- Input validation
+- Cross-user access protection
+
+Run the tests locally:
 
 ```bash
 cd backend
 pytest -v
 ```
 
+---
+
 ## Continuous Integration
 
-GitHub Actions runs on every push to `main` and on pull requests targeting `main`. Two jobs run in parallel:
+GitHub Actions runs on every push to `main` and on pull requests targeting `main`.
 
-- **Backend Tests** — Python 3.11 → install dependencies → `pytest`
-- **Frontend Build** — Node.js 20 → install dependencies → Vite production build
+Two jobs run in parallel:
 
-This catches backend regressions and frontend build failures before merge or deploy.
+**Backend Tests**
+
+```text
+Python 3.11
+→ Install dependencies
+→ Run Pytest
+```
+
+**Frontend Build**
+
+```text
+Node.js 20
+→ Install dependencies
+→ Build with Vite
+```
+
+This verifies backend tests and frontend production builds before changes are merged.
 
 ---
 
 ## Running Locally with Docker
 
-**Prerequisites:** Docker Desktop and Git.
+### Prerequisites
+
+- Docker Desktop
+- Git
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/Zaid-mzk/taskflow.git
+
 cd taskflow
+```
+
+Start the application:
+
+```bash
 docker compose up --build
 ```
 
 Local endpoints:
 
-| Service  | URL                       |
-|----------|---------------------------|
-| Frontend | http://localhost:5173     |
-| Backend  | http://localhost:5000/api |
-| MySQL    | localhost:3306            |
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend | http://localhost:5000/api |
+| MySQL | localhost:3306 |
 
 Stop the stack:
 
@@ -179,11 +282,13 @@ Stop the stack:
 docker compose down
 ```
 
-Remove containers and the local database volume:
+To remove containers and the local database volume:
 
 ```bash
 docker compose down -v
 ```
+
+---
 
 ## Running Without Docker
 
@@ -191,11 +296,39 @@ docker compose down -v
 
 ```bash
 cd backend
+
 python -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\Activate.ps1
+```
+
+Activate the virtual environment:
+
+```bash
+# macOS / Linux
+source venv/bin/activate
+
+# Windows PowerShell
+venv\Scripts\Activate.ps1
+```
+
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
-cp .env.example .env              # Windows: Copy-Item .env.example .env
-# Configure database values in .env, then:
+```
+
+Create the environment file:
+
+```bash
+# macOS / Linux
+cp .env.example .env
+
+# Windows PowerShell
+Copy-Item .env.example .env
+```
+
+Configure the database values in `.env`, then run:
+
+```bash
 python run.py
 ```
 
@@ -203,8 +336,23 @@ python run.py
 
 ```bash
 cd frontend
+
 npm install
-cp .env.example .env              # Windows: Copy-Item .env.example .env
+```
+
+Create the environment file:
+
+```bash
+# macOS / Linux
+cp .env.example .env
+
+# Windows PowerShell
+Copy-Item .env.example .env
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
@@ -212,9 +360,9 @@ npm run dev
 
 ## Environment Variables
 
-### Backend (`backend/.env`)
+### Backend
 
-Based on `backend/.env.example`:
+`backend/.env`:
 
 ```text
 SECRET_KEY
@@ -224,23 +372,39 @@ DATABASE_URL
 
 In production, the backend uses the Railway-provided `DATABASE_URL` to connect to the managed MySQL instance.
 
-### Frontend (`frontend/.env`)
+### Frontend
 
-Based on `frontend/.env.example`:
+`frontend/.env`:
 
 ```text
 VITE_API_URL=https://<backend-domain>/api
 ```
 
-Secrets and environment-specific configuration should never be committed to Git.
+Secrets and environment-specific configuration should not be committed to Git.
 
 ---
 
 ## Docker
 
-The local stack runs three services through Docker Compose: the React frontend, the Flask backend, and MySQL.
+The local environment runs three services through Docker Compose:
 
-The production frontend uses a multi-stage build: Node.js installs dependencies and produces the Vite `dist/` output, which is then served by Nginx Alpine. The build accepts `VITE_API_URL` as a build argument so the production bundle points at the deployed backend.
+```text
+React Frontend
+      │
+      ▼
+Flask Backend
+      │
+      ▼
+    MySQL
+```
+
+The production frontend uses a multi-stage Docker build:
+
+1. Node.js installs dependencies.
+2. Vite generates the production `dist` output.
+3. Nginx Alpine serves the generated frontend.
+
+The production build accepts `VITE_API_URL` as a build argument so the frontend communicates with the deployed backend.
 
 ---
 
@@ -248,7 +412,11 @@ The production frontend uses a multi-stage build: Node.js installs dependencies 
 
 ```text
 taskflow/
-├── .github/workflows/ci.yml
+
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+│
 ├── backend/
 │   ├── app/
 │   │   ├── routes/
@@ -259,14 +427,17 @@ taskflow/
 │   │   ├── extensions.py
 │   │   ├── models.py
 │   │   └── __init__.py
+│   │
 │   ├── tests/
 │   │   ├── conftest.py
 │   │   ├── test_auth.py
 │   │   ├── test_projects.py
 │   │   └── test_tasks.py
+│   │
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   └── run.py
+│
 ├── frontend/
 │   ├── src/
 │   │   ├── api/
@@ -276,12 +447,20 @@ taskflow/
 │   │   ├── App.jsx
 │   │   ├── index.css
 │   │   └── main.jsx
+│   │
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   ├── package.json
 │   ├── postcss.config.js
 │   ├── tailwind.config.js
 │   └── vite.config.js
+│
+├── docs/
+│   └── screenshots/
+│       ├── dashboard.png
+│       ├── project.png
+│       └── signup.png
+│
 ├── docker-compose.yml
 ├── .gitignore
 └── README.md
@@ -291,13 +470,15 @@ taskflow/
 
 ## Deployment
 
-TaskFlow is deployed on Railway as three services connected through a private network:
+TaskFlow is deployed on Railway as three services connected through a private network.
 
-- **Frontend Service** — Docker + Nginx, serving the production React build
-- **Backend Service** — Docker + Gunicorn, exposing the Flask REST API
-- **MySQL Service** — managed database accessed by the backend via `DATABASE_URL`
+- **Frontend Service** — Docker + Nginx serving the production React build
+- **Backend Service** — Docker + Gunicorn running the Flask REST API
+- **MySQL Service** — managed MySQL database accessed by the backend through `DATABASE_URL`
 
-Pushes to `main` trigger automatic redeploys through Railway's GitHub integration.
+The frontend communicates with the backend through the deployed API URL.
+
+Changes pushed to `main` trigger automatic redeployment through Railway's GitHub integration.
 
 ---
 
@@ -313,4 +494,6 @@ Pushes to `main` trigger automatic redeploys through Railway's GitHub integratio
 
 ## Purpose
 
-TaskFlow was built as an end-to-end engineering exercise covering REST API design, JWT authentication, relational data modeling, containerization, CI, and cloud deployment. It is intended to be read, run, and modified — issues and pull requests are welcome.
+TaskFlow is an end-to-end task and project management application covering REST API design, JWT authentication, relational data modeling, CRUD operations, input validation, automated testing, containerization, CI, and cloud deployment.
+
+The application is deployed and available through the live demo above.
