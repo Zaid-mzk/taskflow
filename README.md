@@ -1,6 +1,6 @@
 # TaskFlow
 
-A full-stack task and project management application built with React, Flask, MySQL, JWT authentication, Docker, and Railway.
+A full-stack task and project management application built with React, Flask, MySQL-compatible TiDB Cloud, JWT authentication, Docker, and Vercel.
 
 **By [Zaid Khan](https://www.linkedin.com/in/zaidkhan2703/)**
 
@@ -8,9 +8,11 @@ TaskFlow allows users to create projects, organize tasks, track task status, and
 
 [![CI](https://github.com/Zaid-mzk/taskflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Zaid-mzk/taskflow/actions/workflows/ci.yml)
 
-**Live Demo:** [https://taskflow-production-bf08.up.railway.app](https://taskflow-production-bf08.up.railway.app)
+**Live Demo:** [https://taskflow-mu-sand.vercel.app](https://taskflow-mu-sand.vercel.app)
 
-**API Health:** [https://distinguished-eagerness-production-5caa.up.railway.app/api/health](https://distinguished-eagerness-production-5caa.up.railway.app/api/health)
+**API Health:** [https://taskflow-api-omega.vercel.app/api/health](https://taskflow-api-omega.vercel.app/api/health)
+
+**GitHub Repository:** [https://github.com/Zaid-mzk/taskflow](https://github.com/Zaid-mzk/taskflow)
 
 ---
 
@@ -44,9 +46,9 @@ TaskFlow allows users to create projects, organize tasks, track task status, and
 - RESTful Flask API
 - Automated backend tests with Pytest
 - Dockerized development and production environments
-- Nginx-based frontend serving
+- Nginx-based frontend serving in the Docker deployment
 - GitHub Actions CI
-- Railway production deployment with managed MySQL
+- Cloud deployment using Vercel and TiDB Cloud
 
 ---
 
@@ -59,6 +61,7 @@ TaskFlow allows users to create projects, organize tasks, track task status, and
 - Tailwind CSS
 - React Router
 - Axios
+- Vercel
 
 **Backend**
 
@@ -68,10 +71,11 @@ TaskFlow allows users to create projects, organize tasks, track task status, and
 - SQLAlchemy
 - Flask-JWT-Extended
 - PyMySQL
+- Vercel
 
 **Database**
 
-- MySQL
+- TiDB Cloud Starter (MySQL-compatible database)
 
 **Testing**
 
@@ -83,7 +87,8 @@ TaskFlow allows users to create projects, organize tasks, track task status, and
 - Docker Compose
 - Nginx
 - GitHub Actions
-- Railway
+- Vercel
+- TiDB Cloud
 
 ---
 
@@ -95,33 +100,32 @@ TaskFlow allows users to create projects, organize tasks, track task status, and
                          HTTPS
                            │
                            ▼
-                    ┌─────────────┐
-                    │    User     │
-                    └──────┬──────┘
-                           │
-                           ▼
-              ┌────────────────────────┐
-              │ React + Vite Frontend  │
-              │ Docker + Nginx         │
-              │ Railway                │
-              └────────────┬───────────┘
-                           │
-                     REST API + JWT
-                           │
-                           ▼
-              ┌────────────────────────┐
-              │ Flask Backend          │
-              │ REST API + JWT Auth    │
-              │ Railway                │
-              └────────────┬───────────┘
-                           │
-                       SQLAlchemy
-                           │
-                           ▼
-              ┌────────────────────────┐
-              │ MySQL                  │
-              │ Railway                │
-              └────────────────────────┘
+                     ┌─────────────┐
+                     │    User     │
+                     └──────┬──────┘
+                            │
+                            ▼
+               ┌────────────────────────┐
+               │ React + Vite Frontend  │
+               │ Hosted on Vercel       │
+               └────────────┬───────────┘
+                            │
+                       REST API + JWT
+                            │
+                            ▼
+               ┌────────────────────────┐
+               │ Flask Backend          │
+               │ REST API + JWT Auth    │
+               │ Hosted on Vercel       │
+               └────────────┬───────────┘
+                            │
+                        SQLAlchemy
+                            │
+                            ▼
+               ┌────────────────────────┐
+               │ TiDB Cloud Starter     │
+               │ MySQL-compatible DB   │
+               └────────────────────────┘
 ```
 
 ### Request Flow
@@ -138,10 +142,10 @@ Flask REST API
  │
  │ SQLAlchemy
  ▼
-MySQL
+TiDB Cloud (MySQL-compatible)
 ```
 
-The frontend reads its backend URL from the `VITE_API_URL` environment variable. Locally it points to the Flask development server; in production it points to the deployed Railway backend.
+The frontend reads its backend URL from the `VITE_API_URL` environment variable. Locally, it points to the Flask development API; in production, it points to the deployed Vercel backend.
 
 ### Authentication Flow
 
@@ -368,7 +372,7 @@ cp .env.example .env
 Copy-Item .env.example .env
 ```
 
-Configure the database values in `.env`, then run:
+Configure the database connection and secret values in `.env`, then run:
 
 ```bash
 python run.py
@@ -394,7 +398,7 @@ cp .env.example .env
 Copy-Item .env.example .env
 ```
 
-Start the development server:
+Set `VITE_API_URL` to your local Flask API URL, then start the development server:
 
 ```bash
 npm run dev
@@ -406,25 +410,25 @@ npm run dev
 
 ### Backend
 
-`backend/.env`:
+Configure these values in `backend/.env` for local development and in the Vercel project environment settings for production:
 
 ```text
-SECRET_KEY
-
-JWT_SECRET_KEY
-
-DATABASE_URL
+SECRET_KEY=<your-secret-key>
+JWT_SECRET_KEY=<your-jwt-secret>
+DATABASE_URL=<your-database-connection-string>
 ```
 
-In production, the backend uses the Railway-provided `DATABASE_URL` to connect to the managed MySQL instance.
+The backend uses `DATABASE_URL` to connect to the MySQL-compatible database hosted on TiDB Cloud. Set the connection string according to the database provider's connection instructions. Do not commit credentials or secret values to Git.
 
 ### Frontend
 
-`frontend/.env`:
+Configure `frontend/.env` locally and the corresponding environment variable in Vercel for production:
 
 ```text
-VITE_API_URL=https://<backend-domain>/api
+VITE_API_URL=https://taskflow-api-omega.vercel.app/api
 ```
+
+For local development, set this to the URL of your local Flask API, for example `http://localhost:5000/api`, if that matches your local configuration.
 
 Secrets and environment-specific configuration should not be committed to Git.
 
@@ -444,15 +448,13 @@ Flask Backend
     MySQL
 ```
 
-The production frontend uses a multi-stage Docker build:
+The production frontend Docker build uses a multi-stage process:
 
 1. Node.js installs dependencies.
-
 2. Vite generates the production `dist` output.
-
 3. Nginx Alpine serves the generated frontend.
 
-The production build accepts `VITE_API_URL` as a build argument so the frontend communicates with the deployed backend.
+The Docker production build accepts `VITE_API_URL` as a build argument so the frontend communicates with the configured backend. The live deployment described below uses Vercel for the frontend and backend, with TiDB Cloud for the database.
 
 ---
 
@@ -464,7 +466,7 @@ taskflow/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
-│
+
 ├── backend/
 │   ├── app/
 │   │   ├── routes/
@@ -475,17 +477,17 @@ taskflow/
 │   │   ├── extensions.py
 │   │   ├── models.py
 │   │   └── __init__.py
-│   │
+
 │   ├── tests/
 │   │   ├── conftest.py
 │   │   ├── test_auth.py
 │   │   ├── test_projects.py
 │   │   └── test_tasks.py
-│   │
+
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   └── run.py
-│
+
 ├── frontend/
 │   ├── src/
 │   │   ├── api/
@@ -495,20 +497,20 @@ taskflow/
 │   │   ├── App.jsx
 │   │   ├── index.css
 │   │   └── main.jsx
-│   │
+
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   ├── package.json
 │   ├── postcss.config.js
 │   ├── tailwind.config.js
 │   └── vite.config.js
-│
+
 ├── docs/
 │   └── screenshots/
 │       ├── dashboard.png
 │       ├── project.png
 │       └── signup.png
-│
+
 ├── docker-compose.yml
 ├── .gitignore
 └── README.md
@@ -518,15 +520,17 @@ taskflow/
 
 ## Deployment
 
-TaskFlow is deployed on Railway as three services connected through a private network.
+TaskFlow's live deployment uses Vercel for the frontend and Flask API, with TiDB Cloud Starter providing the MySQL-compatible database.
 
-- **Frontend Service** — Docker + Nginx serving the production React build
-- **Backend Service** — Docker + Gunicorn running the Flask REST API
-- **MySQL Service** — managed MySQL database accessed by the backend through `DATABASE_URL`
+- **Frontend** — React + Vite application hosted on Vercel: [taskflow-mu-sand.vercel.app](https://taskflow-mu-sand.vercel.app)
+- **Backend API** — Flask REST API hosted on Vercel: [taskflow-api-omega.vercel.app](https://taskflow-api-omega.vercel.app/api/health)
+- **Database** — TiDB Cloud Starter, a MySQL-compatible database accessed by the backend through `DATABASE_URL`
 
-The frontend communicates with the backend through the deployed API URL.
+The frontend uses `VITE_API_URL` to communicate with the deployed backend. The backend's environment settings include `DATABASE_URL`, `SECRET_KEY`, and `JWT_SECRET_KEY`. Configure these values in the relevant Vercel project settings; never commit their values to the repository.
 
-Changes pushed to `main` trigger automatic redeployment through Railway's GitHub integration.
+The frontend and backend are deployed as separate Vercel projects. Deployment behavior depends on the Vercel project configuration and connected Git repository.
+
+Vercel Hobby and TiDB Cloud Starter have plan and usage limits; availability and capacity are subject to each provider's current terms.
 
 ---
 
@@ -544,4 +548,4 @@ Changes pushed to `main` trigger automatic redeployment through Railway's GitHub
 
 TaskFlow is an end-to-end task and project management application covering REST API design, JWT authentication, relational data modeling, CRUD operations, input validation, automated testing, containerization, CI, and cloud deployment.
 
-The application is deployed and available through the live demo above.
+The live application is available at [taskflow-mu-sand.vercel.app](https://taskflow-mu-sand.vercel.app).
